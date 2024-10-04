@@ -78,6 +78,8 @@ class Dynamics:
             #     self.parameters = self.control_algorithm(t_start, self.parameters, self.current_state)
             self.control_algorithm1(t_start)
 
+            print("t:", t_start, "S:", self.angleS, "R:", self.angleR, "psai:", self.psai, "u:", self.u, "v:", self.v)
+
             next_state = self.step_simulation(t_start, t_end, self.current_state)
             self.current_state = next_state
             self.x = self.current_state[0]
@@ -96,7 +98,7 @@ class Dynamics:
         self.angleR = self.rudder.rudderControl(self.current_state[0],self.current_state[1],self.current_state[4],self.targetX,self.targetY)
         self.parameters[1] = self.angleS
         self.parameters[2] = self.angleR
-        print("t:",t_start,"S:", self.angleS,"R:",self.angleR,"psai:",self.psai,"u:",self.u,"v:",self.v)
+        # print("t:",t_start,"S:", self.angleS,"R:",self.angleR,"psai:",self.psai,"u:",self.u,"v:",self.v)
     def plot_solution(self, times, states):
         plt.figure(figsize=(10, 8))
         for i in range(6):
@@ -110,8 +112,8 @@ class Dynamics:
 
 
 if __name__ == "__main__":
-    initial_state = [0, 0, 1, 0, 0, 0]
-    parameters = [30, 0, 0, 5, 1.1, 1.2, 0.5, 0.45, 0.3, 3, 1]
+    initial_state = [0, 0, 0, 0, 0, 0]
+    parameters = [0, 90, 0, 5, 0.596, 45.98, 0, 0.38, 0.3, 7.18, 2]
     t_span = [0, 20]
     # t_eval = np.linspace(t_span[0], t_span[1], 1000)
     t_eval_index = 1000

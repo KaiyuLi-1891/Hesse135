@@ -43,4 +43,4 @@ class Rudder:
         directionBearing = math.degrees(math.atan2(targetY-y,targetX-x))
         self.fuzzyTurnTo(bearing,directionBearing)
         self.moveRudderTo()
-        return self.currentRudderPos
+        return (self.currentRudderPos-90)
