@@ -7,7 +7,7 @@ from Sail import Sail
 
 class Dynamics:
     def __init__(self,
-                 initial_state = [0,0,0,0,0,0], #Initial state of the system [x, y, u, v, psai, r]
+                 initial_state = [0,0,0,0,0,0], #Initial state of the system [x, y, u, v, psai, omega]
                  parameters = [1, 0, 0, 4, 5, 6, 0.5, 0.45, 0.3, 3, 1],#System parameters [gamma, angleS, angleR, Vw, P4, P5, P6, P7, P8, P9, P10]
                  t_span = [0,10], #Time span for the simulation [start_time, end_time]
                  t_eval_index = 1000, #Time points at which to store the computed solutions
@@ -31,7 +31,7 @@ class Dynamics:
         self.u = self.initial_state[2]
         self.v = self.initial_state[3]
         self.psai = self.initial_state[4]
-        self.r = self.initial_state[5]
+        self.omega = self.initial_state[5]
 
         self.gamma = self.parameters[0]
         self.angleS = self.parameters[1]
@@ -43,7 +43,7 @@ class Dynamics:
 
 
     def complex_dynamics(self, t, state):
-        x, y, u, v, psai, r = state
+        x, y, u, v, psai, omega = state
         gamma, angleS, angleR, Vw, P4, P5, P6, P7, P8, P9, P10 = self.parameters
 
         # Hydrodynamic and aerodynamic forces
@@ -55,14 +55,14 @@ class Dynamics:
         dy_dt = u * np.sin(math.radians(psai)) + v * np.cos(math.radians(psai))
         du_dt = (fs * np.sin(math.radians(angleS)) - fr * np.sin(math.radians(angleR))) / P9
         dv_dt = (-fs * np.cos(math.radians(angleS)) + fr * np.sin(math.radians(angleR))) / P9
-        dpsai_dt = r
-        dr_dt = (-P8 * fr * np.cos(math.radians(angleR)) + (P6 - P7 * np.cos(math.radians(angleS))) * fs) / P10
+        dpsai_dt = omega
+        domega_dt = (-P8 * fr * np.cos(math.radians(angleR)) + (P6 - P7 * np.cos(math.radians(angleS))) * fs) / P10
 
-        return np.array([dx_dt, dy_dt, du_dt, dv_dt, dpsai_dt, dr_dt])
+        return np.array([dx_dt, dy_dt, du_dt, dv_dt, dpsai_dt, domega_dt])
 
     def step_simulation(self, t_start, t_end, state):
         t_span = [t_start, t_end]
-        solution = solve_ivp(self.complex_dynamics,t_span,state,t_eval = [t_end])
+        solution = solve_ivp(self.complex_dynamics,t_span,state,t_eval = [t_end],method = 'RK45')
         return solution.y[:,-1]
 
     def solve_dynamics(self):
@@ -87,7 +87,7 @@ class Dynamics:
             self.u = self.current_state[2]
             self.v = self.current_state[3]
             self.psai = self.current_state[4]
-            self.r = self.current_state[5]
+            self.omega = self.current_state[5]
             states.append(next_state)
             times.append(t_end)
 
