@@ -8,7 +8,8 @@ from Sail import Sail
 class Dynamics:
     def __init__(self,
                  initial_state = [0,0,0,0,0,0], #Initial state of the system [x, y, u, v, psai, omega]
-                 parameters = [1, 0, 0, 4, 5, 6, 0.5, 0.45, 0.3, 3, 1],#System parameters [gamma, angleS, angleR, Vw, P4, P5, P6, P7, P8, P9, P10]
+                 parameters = [1, 0, 0, 4, 0, 0 ,0, 5, 6, 0.5, 0.45, 0.3, 3, 1, 0, 0, 0],
+                 #System parameters [gamma, angleS, angleR, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega]
                  t_span = [0,10], #Time span for the simulation [start_time, end_time]
                  t_eval_index = 1000, #Time points at which to store the computed solutions
                  control_algorithm = None,
@@ -44,7 +45,7 @@ class Dynamics:
 
     def complex_dynamics(self, t, state):
         x, y, u, v, psai, omega = state
-        gamma, angleS, angleR, Vw, P4, P5, P6, P7, P8, P9, P10 = self.parameters
+        gamma, angleS, angleR, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega = self.parameters
 
         # Hydrodynamic and aerodynamic forces
         fr = P5 * u * np.sin(math.radians(angleR))  # Force on rudder
@@ -53,10 +54,10 @@ class Dynamics:
         # Differential equations
         dx_dt = u * np.cos(math.radians(psai)) - v * np.sin(math.radians(psai))
         dy_dt = u * np.sin(math.radians(psai)) + v * np.cos(math.radians(psai))
-        du_dt = (fs * np.sin(math.radians(angleS)) - fr * np.sin(math.radians(angleR))) / P9
-        dv_dt = (-fs * np.cos(math.radians(angleS)) + fr * np.sin(math.radians(angleR))) / P9
+        du_dt = (fs * np.sin(math.radians(angleS)) - fr * np.sin(math.radians(angleR)) - P1 * u) / (P9 - amU)
+        dv_dt = (-fs * np.cos(math.radians(angleS)) + fr * np.sin(math.radians(angleR)) - P2 * v) / (P9 - amV)
         dpsai_dt = omega
-        domega_dt = (-P8 * fr * np.cos(math.radians(angleR)) + (P6 - P7 * np.cos(math.radians(angleS))) * fs) / P10
+        domega_dt = (-P8 * fr * np.cos(math.radians(angleR)) + (P6 - P7 * np.cos(math.radians(angleS))) * fs - P3 * omega) / (P10 - amOmega)
 
         return np.array([dx_dt, dy_dt, du_dt, dv_dt, dpsai_dt, domega_dt])
 
@@ -113,7 +114,7 @@ class Dynamics:
 
 if __name__ == "__main__":
     initial_state = [0, 0, 0, 0, 0, 0]
-    parameters = [0, 90, 0, 5, 0.596, 45.98, 0, 0.38, 0.3, 7.18, 2]
+    parameters = [0, 90, 0, 5, 0, 0, 0, 0.596, 45.98, 0, 0.38, 0.3, 7.18, 2, 0, 0, 0]
     t_span = [0, 20]
     # t_eval = np.linspace(t_span[0], t_span[1], 1000)
     t_eval_index = 1000
