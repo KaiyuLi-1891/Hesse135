@@ -42,5 +42,12 @@ class Rudder:
         bearing = psai
         directionBearing = math.degrees(math.atan2(targetY-y,targetX-x))
         self.fuzzyTurnTo(bearing,directionBearing)
-        self.moveRudderTo()
-        return (self.currentRudderPos-90)
+        # self.moveRudderTo()
+        if self.currentRudderPos < self.targetRudderPos:
+            output = 1
+        elif self.currentRudderPos > self.targetRudderPos:
+            output = -1
+        else:
+            output = 0
+        # return (self.currentRudderPos-90)
+        return output

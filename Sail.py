@@ -93,8 +93,11 @@ class Sail:
 
     def sailControl(self,psai,gamma,angleS):
         currentAngle = 360 - gamma + psai
-        self.moveSailTo(currentAngle)
-        return (90 - self.currentSailPos)
+        output = self.calculatePID(currentAngle)
+        return output
+        # self.moveSailTo(currentAngle)
+        # return (90 - self.currentSailPos)
+
 
 
 # Setup and main loop
