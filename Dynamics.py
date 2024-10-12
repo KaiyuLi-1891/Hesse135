@@ -7,14 +7,15 @@ from Sail import Sail
 
 class Dynamics:
     def __init__(self,
-                 initial_state = [0, 90, 0, 0, 0, 0, 0, 0], #Initial state of the system [x, y, u, v, psi, omega, angleS, angleR]
-                 parameters = [1, 4, 0, 0 ,0, 5, 6, 0.5, 0.45, 0.3, 3, 1, 0.05*3, 0.2*3, 0.36*1],
+                 initial_state = [0, 0, 0, 0, 0, 0, 0, 0], #Initial state of the system [x, y, u, v, psi, omega, angleS, angleR]
+                 parameters = [1, 4, 1, 5 ,0.6, 5, 6, 0.5, 0.45, 0.3, 6, 1, 0.05*3, 0.2*3, 0.36*1],
                  #System parameters [gamma, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega]
-                 t_span = [0,5], #Time span for the simulation [start_time, end_time]
+                 t_span = [0,20], #Time span for the simulation [start_time, end_time]
                  t_eval_index = 1000, #Time points at which to store the computed solutions
                  control_algorithm = None,
                  targetX = 0,
-                 targetY = 0
+                 targetY = 0,
+                 force_order = 2 # if 1, the force is proportional to u; if 2, the force is proportional to u^2
     ):
 
         self.initial_state = initial_state
@@ -24,6 +25,7 @@ class Dynamics:
         self.control_algorithm = control_algorithm
         self.targetX = targetX
         self.targetY = targetY
+        self.force_order = force_order
 
         self.current_state = self.initial_state
         self.control_input = [0,0]
@@ -49,10 +51,12 @@ class Dynamics:
         gamma, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega = self.parameters
 
         # Hydrodynamic and aerodynamic forces
-        # fr = P5 * u**2 * np.sin(math.radians(angleR))  # Force on rudder
-        fr = P5 * u **2 * np.sin(math.radians(angleR))  # Force on rudder
-        fs = P4 * np.sin(math.radians(psi - gamma + angleS)) * ((Vw*np.sin(math.radians(gamma-psi))-v)**2 + (Vw*np.cos(math.radians(gamma-psi))-u)**2)  # Force on sail
-
+        if self.force_order == 1:
+            fr = P5 * u**2 * np.sin(math.radians(angleR))  # Force on rudder
+            fs = P4 * np.sin(math.radians(psi - gamma + angleS)) * np.sqrt(((Vw*np.sin(math.radians(gamma-psi))-v)**2 + (Vw*np.cos(math.radians(gamma-psi))-u)**2))  # Force on sail
+        elif self.force_order == 2:
+            fr = P5 * u **2 * np.sin(math.radians(angleR))  # Force on rudder
+            fs = P4 * np.sin(math.radians(psi - gamma + angleS)) * ((Vw * np.sin(math.radians(gamma - psi)) - v) ** 2 + (Vw * np.cos(math.radians(gamma - psi)) - u) ** 2)
         # Differential equations
         dx_dt = u * np.cos(math.radians(psi)) - v * np.sin(math.radians(psi))
         dy_dt = u * np.sin(math.radians(psi)) + v * np.cos(math.radians(psi))
