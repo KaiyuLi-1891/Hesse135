@@ -4,11 +4,12 @@ import math
 from scipy.integrate import solve_ivp
 from Rudder import Rudder
 from Sail import Sail
+from Wind import Wind
 
 class Dynamics:
     def __init__(self,
                  initial_state = [0, 0, 0, 0, 0, 0, 0, 0], #Initial state of the system [x, y, u, v, psi, omega, angleS, angleR]
-                 parameters = [1, 4, 1, 5 ,0.6, 5, 6, 0.5, 0.45, 0.3, 6, 1, 0.05*3, 0.2*3, 0.36*1],
+                 parameters = [1, 4, 1, 5 ,0.6, 5, 6, 0.5, 0.45, 0.3, 14.12, 1, 0.05*3, 0.2*3, 0.36*1],
                  #System parameters [gamma, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega]
                  t_span = [0,20], #Time span for the simulation [start_time, end_time]
                  t_eval_index = 1000, #Time points at which to store the computed solutions
@@ -44,11 +45,14 @@ class Dynamics:
 
         self.rudder = Rudder()
         self.sail = Sail()
+        self.wind = Wind()
 
 
     def complex_dynamics(self, t, state):
         x, y, u, v, psi, omega, angleS, angleR = state
         gamma, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega = self.parameters
+        gamma = self.gamma
+        Vw = self.Vw
 
         # Hydrodynamic and aerodynamic forces
         if self.force_order == 1:
@@ -87,6 +91,8 @@ class Dynamics:
         for i in range(1, len(self.t_eval)):
             t_start = self.t_eval[i - 1]
             t_end = self.t_eval[i]
+
+            self.Vw, self.gamma = self.wind.getWind()
 
             if self.control_algorithm:
                 self.control_input = self.control_algorithm(t_start, self.parameters, self.current_state)
