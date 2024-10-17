@@ -9,14 +9,17 @@ from Wind import Wind
 class Dynamics:
     def __init__(self,
                  initial_state = [0, 0, 0, 0, 0, 0, 0, 0], #Initial state of the system [x, y, u, v, psi, omega, angleS, angleR]
-                 parameters = [1, 4, 1, 5 ,0.6, 5, 6, 0.5, 0.45, 0.3, 14.12, 1, 0.05*3, 0.2*3, 0.36*1],
+                 parameters = [90, 4, 1, 20 ,0.6, 5, 6, 0.5, 0.45, 0.3, 14.12, 10, 0.05*3, 0.2*3, 0.36*1],
                  #System parameters [gamma, Vw, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, amU, amV, amOmega]
-                 t_span = [0,20], #Time span for the simulation [start_time, end_time]
+                 t_span = [0,11], #Time span for the simulation [start_time, end_time]
                  t_eval_index = 1000, #Time points at which to store the computed solutions
                  control_algorithm = None,
-                 targetX = 0,
-                 targetY = 0,
-                 force_order = 2 # if 1, the force is proportional to u; if 2, the force is proportional to u^2
+                 targetX = 20,
+                 targetY = 10,
+                 force_order = 2, # if 1, the force is proportional to u; if 2, the force is proportional to u^2
+                 Kp = 1,
+                 Ki = 0.01,
+                 Kd = 0.05
     ):
 
         self.initial_state = initial_state
@@ -44,8 +47,10 @@ class Dynamics:
         self.Vw = self.parameters[1]
 
         self.rudder = Rudder()
-        self.sail = Sail()
+        self.sail = Sail(Kp=Kp,Ki=Ki,Kd=Kd)
         self.wind = Wind()
+
+        self.bearingErrorList = []
 
 
     def complex_dynamics(self, t, state):
@@ -100,9 +105,20 @@ class Dynamics:
                 # self.control_algorithm1(t_start)
                 self.control_algorithm1(t_start)
 
+            while self.psi > 360:
+                self.psi -= 360
+            while self.psi < 0:
+                self.psi +=360
+
+            while self.angleS > 360:
+                self.angleS -= 360
+            while self.angleS < 0:
+                self.angleS += 360
+
             print("t:", t_start, "S:", self.angleS, "R:", self.angleR, "psi:", self.psi, "u:", self.u, "v:", self.v)
             # state = np.concatenate((self.current_state, self.control_input))
             # print("state:",state)
+
 
             next_state = self.step_simulation(t_start, t_end, self.current_state)
             self.current_state = next_state
@@ -116,6 +132,9 @@ class Dynamics:
             self.angleR = self.current_state[7]
             states.append(self.current_state)
             times.append(t_end)
+
+            error = self.calculateBearingError()
+            self.bearingErrorList.append(error)
 
         return np.array(times), np.array(states)
 
@@ -136,6 +155,26 @@ class Dynamics:
         plt.title('The Trajectory of the Sailboat')
         plt.show()
 
+    def calculateBearingError(self):
+        targetBearing = math.atan2(self.targetY-self.y, self.targetX-self.x)
+        targetBearing = math.degrees(targetBearing)
+
+        while targetBearing < 360:
+            targetBearing += 360
+
+        currentBearing = self.psi
+
+        if currentBearing - targetBearing <= 180 and currentBearing - targetBearing >= -180:
+            error = np.abs(currentBearing - targetBearing)
+        elif currentBearing - targetBearing > 180:
+            error = 360 - (currentBearing - targetBearing)
+        elif currentBearing - targetBearing < -180:
+            error = 360 + currentBearing - targetBearing
+
+        return error
+
+
+
 
 if __name__ == "__main__":
     # initial_state = [0, 0, 0, 0, 0, 0]
@@ -145,8 +184,8 @@ if __name__ == "__main__":
     # t_eval_index = 1000
 
     dynamics = Dynamics()
-    times, states = dynamics.solve_dynamics()  # Solve the dynamics
-    dynamics.plot_solution(times,states)  # Plot the results
+    times, states = dynamics.solve_dynamics()
+    dynamics.plot_solution(times,states)
 
 
 

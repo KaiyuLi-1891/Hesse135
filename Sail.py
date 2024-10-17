@@ -4,7 +4,7 @@ import math
 
 
 class Sail:
-    def __init__(self):
+    def __init__(self,Kp = 1, Ki = 0.01, Kd = 0.05):
 
         self.currentSailPos = 0
         self.targetSailPos = 0
@@ -14,9 +14,9 @@ class Sail:
         self.switchCheck = False
 
         # PID gains
-        self.Kp = 1.0
-        self.Ki = 0.01
-        self.Kd = 0.05
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
         self.previousError = 0
         self.integral = 0
 

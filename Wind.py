@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Wind:
-    def __init__(self, meanV=10, varV=5, meanGamma=45, varGamma=0.5):
+    def __init__(self, meanV=5, varV=2, meanGamma=45, varGamma=0.5):
         # meanV: mean value of velocity; varV: variance of velocity;
         # meanGamma: mean value of wind direction; varGamma: variance of wind direction.
         self.meanV = meanV
