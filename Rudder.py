@@ -38,7 +38,6 @@ class Rudder:
             self.lastRudderTime = current_time
 
     def rudderControl(self,x,y,psai,targetX,targetY):
-        ################# The actual angular velocity of the rudder has not been considered yet ##################
         bearing = psai
         directionBearing = math.degrees(math.atan2(targetY-y,targetX-x))
         self.fuzzyTurnTo(bearing,directionBearing)

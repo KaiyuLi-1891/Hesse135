@@ -38,7 +38,7 @@ def objective(trial):
     error_sum = np.mean(dynamics.bearingErrorList)
     return error_sum
 
-if __name__ = "__main__":
+if __name__ == '__main__':
     study = optuna.create_study(direction='minimize')
     study.optimize(objective, n_trials=1000)
 

@@ -2,13 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Wind:
-    def __init__(self, meanV=5, varV=2, meanGamma=45, varGamma=0.5):
+    def __init__(self, meanV=5, varV=2, meanGamma=45, varGamma=0.5, tau=10, dt=0.1):
         # meanV: mean value of velocity; varV: variance of velocity;
         # meanGamma: mean value of wind direction; varGamma: variance of wind direction.
+        # tau: the time constant to smooth the change of the wind direction and velocity
         self.meanV = meanV
         self.varV = varV
         self.meanGamma = meanGamma * np.pi / 180
         self.varGamma = varGamma
+        self.tau = tau
+        self.dt = dt
 
         # Calculate Weibull scale (lambda) and shape (k) parameters from mean and variance
         self.kV = (self.varV / (self.meanV ** 2)) ** (-1 / 2)  # Shape parameter (k)
@@ -16,16 +19,18 @@ class Wind:
 
     def getWind(self):
         # Weibull distribution for the wind velocity.
-        V = np.random.weibull(self.kV) * self.lambdaV
+        self.V = self.meanV
+        self.Gamma = self.meanGamma * 180 / np.pi
+
+        new_V = np.random.weibull(self.kV) * self.lambdaV
+        self.V += (new_V - self.V) * self.dt / self.tau
 
         # Von Mises distribution for the wind direction.
-        Gamma = np.random.vonmises(self.meanGamma, 1 / self.varGamma)  # Concentration = 1 / variance
-        Gamma = Gamma * 180 / np.pi
+        new_Gamma = np.random.vonmises(self.meanGamma, 1 / self.varGamma)  # Concentration = 1 / variance
+        new_Gamma = new_Gamma * 180 / np.pi
+        self.Gamma += (new_Gamma - self.Gamma) * self.dt / self.tau
 
-        # Return the velocity (V) and direction (Gamma)
-        return V, Gamma
-
-# Example usage
+        return self.V, self.Gamma
 
 if __name__ == "__main__":
     mean_velocity = 10  

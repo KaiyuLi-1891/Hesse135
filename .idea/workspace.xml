@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19597944-d58f-4b60-b118-ac5209b27dae" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Dynamics4DOF.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tasks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dynamics.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dynamics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rudder.py" beforeDir="false" afterPath="$PROJECT_DIR$/Rudder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sail.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sail.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TuningPara.py" beforeDir="false" afterPath="$PROJECT_DIR$/TuningPara.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Wind.py" beforeDir="false" afterPath="$PROJECT_DIR$/Wind.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

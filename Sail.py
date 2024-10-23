@@ -1,4 +1,4 @@
-
+import numpy as np
 import time
 import math
 
@@ -91,12 +91,12 @@ class Sail:
         self.currentSailPos = max(0, min(180, self.currentSailPos))  # Constrain the servo movement
         # self.sailServo.write(self.currentSailPos)
 
-    def sailControl(self,psai,gamma,angleS):
-        currentAngle = 360 - gamma + psai
+    def sailControl(self,psi,gamma,angleS):
+        currentAngle = 360 - gamma + psi
+        currentAngle = np.mod(currentAngle, 360)
         output = self.calculatePID(currentAngle)
         return output
-        # self.moveSailTo(currentAngle)
-        # return (90 - self.currentSailPos)
+
 
 
 
